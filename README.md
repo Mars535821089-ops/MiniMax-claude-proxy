@@ -23,6 +23,9 @@
   <a href="https://www.python.org/">
     <img alt="Python" src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue?style=flat-square">
   </a>
+  <a href="./MILESTONES.md">
+    <img alt="Milestone" src="https://img.shields.io/badge/milestone-2026--06--12%20first%20release-ff69b4?style=flat-square">
+  </a>
 </p>
 
 [🇺🇸 English](./README.en.md) | [🇨🇳 简体中文](./README.md)
