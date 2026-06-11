@@ -1,0 +1,55 @@
+# Gitleaks 配置 —— 防止 API Key 误提交
+# 配合 pre-commit 钩子使用（见 .github/workflows/gitleaks.yml）
+# 文档: https://github.com/gitleaks/gitleaks
+
+title = "MiniMax-Claude-Proxy Gitleaks Config"
+
+[extend]
+useDefault = true
+
+# 允许在 docs/test 中出现明显占位符（防止 false positive）
+[allowlist]
+description = "允许的占位符"
+regexes = [
+  '''(?i)(sk-cp-)?(your|my|test|fake|example|sample|placeholder|xxx|在这里|填您的|真实key).{0,30}key''',
+  '''(?i)(your|my|test|fake|example|sample|placeholder).{0,10}api[_-]?key''',
+]
+paths = [
+  '''README\.md''',
+  '''CHANGELOG\.md''',
+  '''config\.yaml\.example''',
+  '''docs/.*\.md''',
+  '''tests/.*\.py''',
+  '''proxy/config\.py''',
+]
+
+# 自定义规则（针对 MiniMax / Anthropic / GitHub / 通用模式）
+[[rules]]
+id = "MiniMax-api-key"
+description = "MiniMax API Key"
+regex = '''sk-cp-[a-zA-Z0-9_-]{32,}'''
+keywords = ["sk-cp-"]
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API Key"
+regex = '''sk-ant-[a-zA-Z0-9_-]{32,}'''
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key"
+regex = '''sk-[a-zA-Z0-9]{32,}'''
+keywords = ["sk-"]
+
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[a-zA-Z0-9]{36}'''
+keywords = ["ghp_"]
+
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Token"
+regex = '''gho_[a-zA-Z0-9]{36}'''
+keywords = ["gho_"]

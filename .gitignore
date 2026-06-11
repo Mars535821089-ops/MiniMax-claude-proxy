@@ -17,6 +17,17 @@ config.yaml
 config.local.yaml
 *.local.yaml
 secrets.yaml
+.env
+.env.*
+*.env
+
+# 任何带 "secret" / "credential" 字样的常见文件名
+*credentials*
+*credentials.json
+*secrets*
+*secrets.json
+service-account*.json
+gha-creds-*.json
 
 # ===== 运行时数据 =====
 *.db
@@ -40,7 +51,7 @@ logs/
 noxfile.py
 .python-version
 
-# ===== 系统垃圾 =====
+# ===== 编辑器 / IDE =====
 .DS_Store
 Thumbs.db
 *.swp
