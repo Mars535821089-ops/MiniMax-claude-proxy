@@ -26,24 +26,41 @@ async def web_search(query: str, *, cfg: WebSearchCfg) -> list[dict]:
 
 
 async def _ddg(query: str, k: int, timeout: int) -> list[dict]:
+    """DuckDuckGo 搜索 —— 优先用新包 ddgs，回退到老包 duckduckgo_search。"""
+    import asyncio
+    # 新包 ddgs
+    try:
+        from ddgs import DDGS
+        def _run():
+            with DDGS(timeout=timeout) as ddgs:
+                return list(ddgs.text(query, max_results=k))
+        items = await asyncio.to_thread(_run)
+        return [
+            {"title": it.get("title"), "url": it.get("href"), "snippet": it.get("body")}
+            for it in items
+        ]
+    except ImportError:
+        pass
+    except Exception as e:
+        log.warning(f"ddgs search fail: {e}")
+        return []
+    # 老包回退
     try:
         from duckduckgo_search import DDGS
-    except ImportError:
-        log.warning("duckduckgo-search not installed")
-        return []
-    import asyncio
-    def _run():
-        with DDGS(timeout=timeout) as ddgs:
-            return list(ddgs.text(query, max_results=k))
-    try:
+        def _run():
+            with DDGS(timeout=timeout) as ddgs:
+                return list(ddgs.text(query, max_results=k))
         items = await asyncio.to_thread(_run)
+        return [
+            {"title": it.get("title"), "url": it.get("href"), "snippet": it.get("body")}
+            for it in items
+        ]
+    except ImportError:
+        log.warning("neither ddgs nor duckduckgo_search installed")
+        return []
     except Exception as e:
         log.warning(f"ddg search fail: {e}")
         return []
-    return [
-        {"title": it.get("title"), "url": it.get("href"), "snippet": it.get("body")}
-        for it in items
-    ]
 
 
 async def _MiniMax_mcp(query: str, k: int, timeout: int) -> list[dict]:
