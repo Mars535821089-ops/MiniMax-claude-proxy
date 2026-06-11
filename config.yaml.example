@@ -1,0 +1,108 @@
+# MiniMax-Claude-Proxy 配置示例
+# 复制为 config.yaml 后填入您的真实 API Key
+
+server:
+  host: 127.0.0.1
+  port: 8787
+  log_level: INFO
+  # SSE 心跳间隔（秒），避免长任务被代理切断
+  sse_ping_interval: 15
+  # 单次请求最大执行时间（秒）
+  request_timeout: 1800
+
+upstream:
+  base_url: "https://api.minimaxi.com/anthropic"
+  api_key: "sk-cp-在这里填您的真实key"
+  model_id: "MiniMax-M3"
+  # 连接池
+  max_connections: 32
+  # 单请求重试
+  max_retries: 3
+  retry_backoff_seconds: 2
+
+# === 6 大块兼容层开关 ===
+
+cache:
+  enabled: true
+  # 存储后端：sqlite | memory
+  backend: sqlite
+  db_path: ~/.MiniMax-claude-proxy/cache.db
+  # 命中策略：strict（完全匹配）| prefix（前缀匹配）
+  strategy: prefix
+  # TTL（秒）
+  default_ttl: 300
+  long_ttl: 3600
+  # 最大缓存条目数
+  max_entries: 10000
+
+thinking:
+  enabled: true
+  # 注入策略：system_prompt（system 注入）| user_prefix（user 前缀注入）
+  injection: system_prompt
+  # 标签
+  open_tag: "<thinking>"
+  close_tag: "</thinking>"
+  # 最大 thinking budget
+  default_budget: 8192
+
+server_side_tools:
+  enabled: true
+  # 本地实现哪些 Anthropic server-side 工具
+  enable_web_search: true
+  enable_code_execution: true
+  enable_bash: false  # Claude Code 已有本地 Bash
+  web_search:
+    backend: duckduckgo  # duckduckgo | MiniMax_mcp | serper
+    max_results: 5
+    timeout: 10
+  code_execution:
+    backend: subprocess  # subprocess | docker
+    timeout: 30
+    memory_limit_mb: 512
+
+schema:
+  enabled: true
+  # 复杂 schema 简化策略
+  flatten_oneof: true
+  flatten_anyof: true
+  expand_refs: true
+  max_depth: 5
+  # 模型回参后是否还原嵌套
+  reconcile_response: true
+
+multimodal:
+  enabled: true
+  # 图片处理
+  image:
+    max_size_mb: 20
+    auto_resize: true
+    target_long_edge: 1568
+  pdf:
+    # 提取策略：text（仅文本）| text_and_images（关键页转图）| images_only
+    strategy: text_and_images
+    max_pages: 50
+    image_pages_threshold: 5  # 超过此页数才转图
+  audio_video:
+    # 通过 MiniMax MCP 路由
+    route_via_mcp: true
+    mcp_endpoint: "http://127.0.0.1:8765"
+
+sse:
+  # 缓冲整块再分片，避免 input_json_delta 错位
+  buffer_tool_use_blocks: true
+  # 单 SSE 事件最大字节数
+  max_event_bytes: 65536
+  # 客户端断流后的重连窗口（秒）
+  reconnect_window: 60
+  # 强制注入 message_start.usage 的 cache_* 占位字段
+  inject_cache_usage_placeholder: true
+
+# 模型映射 —— Claude Code 请求的 claude-* model id 会被映射到 MiniMax-M3
+model_mapping:
+  "claude-opus-4-6": "MiniMax-M3"
+  "claude-opus-4-1-20250805": "MiniMax-M3"
+  "claude-sonnet-4-5": "MiniMax-M3"
+  "claude-3-5-haiku-20241022": "MiniMax-M3"
+  "claude-3-5-sonnet-20241022": "MiniMax-M3"
+  # 默认 fallback
+  "_default": "MiniMax-M3"

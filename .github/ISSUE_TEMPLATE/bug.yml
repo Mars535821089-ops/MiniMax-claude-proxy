@@ -1,0 +1,107 @@
+name: 🐛 Bug Report
+description: 报告一个 bug，帮助我们复现和修复
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写 bug 报告！请尽可能提供详细信息，以便我们能快速复现。
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重程度
+      description: 这个问题对您的影响有多大？
+      options:
+        - Critical（代理完全无法启动 / Claude Code 不能用）
+        - High（核心功能失效 / 反复出错）
+        - Medium（有 workaround，但影响体验）
+        - Low（小问题 / 文档不全）
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 用 1-2 句话说明发生了什么
+      placeholder: "比如：发送流式请求时 Claude Code 报错 tool_use.id 不匹配"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      description: 一步步告诉我们怎么重现
+      placeholder: |
+        1. 启动代理 `bash scripts/start.sh`
+        2. 发送请求 `curl ...`
+        3. 看到报错 `xxx`
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为
+      description: 您预期应该发生什么
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 实际发生了什么（含错误信息）
+    validations:
+      required: true
+
+  - type: input
+    id: proxy_version
+    attributes:
+      label: proxy 版本
+      description: 在终端跑 `python -m proxy.main --version` 或看 `git describe` 的结果
+      placeholder: "v0.1.0"
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python 版本
+      placeholder: "3.12.4"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 关键日志（脱敏后）
+      description: 把代理的 ERROR/INFO 行复制进来，**务必删除 api_key**
+    validations:
+      required: false
+
+  - type: textarea
+    id: config
+    attributes:
+      label: 相关配置
+      description: 贴 config.yaml（**务必删除 api_key**）
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 自查清单
+      options:
+        - label: 我已确认这是 MiniMax-Claude-Proxy 的问题（不是 MiniMax 上游 / Claude Code 的问题）
+        - label: 我已脱敏掉所有 API Key
+        - label: 我已搜过现有 issue 没有重复

@@ -1,0 +1,29 @@
+name: ❓ Question / Help
+description: 使用问题、配置问题、调试帮助
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提问前请先看 [README](https://github.com/Mars535821089-ops/MiniMax-claude-proxy#readme) 和 [Troubleshooting](https://github.com/Mars535821089-ops/MiniMax-claude-proxy#排错)。
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 您的问题
+      placeholder: "比如：怎样让 Claude Code 走代理？"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 已尝试的方法
+      description: 您已经试过什么？
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息
+      description: OS / Python 版本 / 代理版本

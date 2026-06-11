@@ -1,0 +1,59 @@
+name: ✨ Feature Request
+description: 提出新功能或改进建议
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您的创意！请详细描述使用场景，这样我们能更好地评估和实现。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 您想解决的问题
+      description: 描述当前痛点，不只是要的功能
+      placeholder: "比如：每次切换项目都要手动重启代理才能让 Claude Code 重新连接"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 您期望的解决方案
+      description: 您心目中怎么解决？画个图也行
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 考虑过的替代方案
+      description: 您还想过什么办法？为什么不行？
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: 使用场景
+      description: 谁会用、什么场景、频率？
+      placeholder: "我个人每天用 Claude Code 写 Python 5 小时，希望 ..."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 重要性
+      options:
+        - 🔥 很重要（我现在就需要）
+        - 🟡 想要（一个月内用上）
+        - 🟢 nice-to-have
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: willingness
+    attributes:
+      label: 愿意参与吗？
+      options:
+        - label: 我愿意自己实现并提交 PR
+        - label: 我可以帮忙写测试 / 文档
+        - label: 我只能反馈用，等别人实现

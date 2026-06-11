@@ -1,0 +1,56 @@
+# ===== Python 虚拟环境与构建产物 =====
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+build/
+dist/
+*.so
+
+# ===== 配置（包含真实 API Key） =====
+config.yaml
+config.local.yaml
+*.local.yaml
+secrets.yaml
+
+# ===== 运行时数据 =====
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+.cache/
+*.log
+logs/
+
+# ===== 缓存目录 =====
+.cache/
+.mypy_cache/
+.ruff_cache/
+.pyright_cache/
+.tox/
+noxfile.py
+.python-version
+
+# ===== 系统垃圾 =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+.fleet/
+
+# ===== 用户运行时（可能含隐私） =====
+~/.MiniMax-claude-proxy/
+# 注：仓库根的 .MiniMax-claude-proxy/ 是合法的示例配置目录，不忽略
