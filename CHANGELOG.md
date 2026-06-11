@@ -5,6 +5,30 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-12
+
+### ✨ 新增 (Added)
+- **GitHub Pages 文档站**：mkdocs + Material 主题 + mike 多版本管理
+  - 在线地址：https://mars535821089-ops.github.io/MiniMax-claude-proxy/latest/
+  - 自动部署 workflow：`.github/workflows/docs.yml`（push to main 触发）
+  - 11 个 docs/*.md 源文件 + Material 主题定制 CSS / MathJax 集成
+  - 中文全文搜索 + 暗色模式 + 移动端响应式
+- 测试结果：6/6 大块真上游全 PASS
+  - ① Prompt Caching — 同请求 2.17s → 0.01s（**217 倍提速**）
+  - ② Extended Thinking — thinking 块 + text 块双块输出
+  - ③ 复杂 tool_use schema — oneOf 对象分支嵌套还原
+  - ④ 多模态 — 红色 PNG 识别为"暗红色"
+  - ⑤ SSE 稳定性 — 10 事件完整序列 + 15s 心跳 + event_id
+  - ⑥ Server-side Tool (web_search) — ddgs 端到端 PASS
+
+### 🐛 修复 (Fixed)
+- **ddgs 包升级**：`web_search` 工具从废弃的 `duckduckgo-search` 切到新包 `ddgs`，老包做回退兼容
+- **mkdocs CI 修复**：
+  - mike 2.x 用 `--update-aliases` 取代废弃的 `--update-defaults`
+  - `git-revision-date-localized` 插件加入 `requirements-docs.txt`
+  - `contributing.md` 链接大小写不匹配 strict 模式（`./SECURITY.md` → `./security.md`）
+- **.gitignore 补强**：屏蔽 `config.yaml.bak*` 和 mkdocs 生成的 `site/` 目录
+
 ## [0.1.0] - 2026-06-12
 
 ### ✨ 新增 (Added)

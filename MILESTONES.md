@@ -25,13 +25,43 @@
 
 ---
 
+## 🎯 2026-06-12 — 6 大块真上游全 PASS
+
+v0.1.1 真上游回归测试结果。每一块都用**真实 MiniMax-M3 API** 跑通端到端：
+
+| # | 大块 | 真上游表现 |
+|---|------|----------|
+| ① | Prompt Caching | 同请求 2.17s → **0.01s**（**217 倍提速**）|
+| ② | Extended Thinking | thinking 块（英文推理 233 字）+ text 块（中文解答）|
+| ③ | 复杂 tool_use schema | oneOf 选对象分支，target={ipv4:"8.8.8.8", port:53} 嵌套还原 |
+| ④ | 多模态 | 100×100 红 PNG 识别为"暗红色" |
+| ⑤ | SSE 稳定性 | 10 事件完整序列 + 15s ping + event_id e1-e10 |
+| ⑥ | web_search | ddgs 端到端 PASS（搜索 → 回灌 → 综合 "Python 3.13 于 2024 年 10 月 7 日正式发布"）|
+
+修复路上踩到 1 个真生产 bug + 4 个 mkdocs CI bug，全部记录在 [CHANGELOG](CHANGELOG.md)。
+
+---
+
+## 🌐 2026-06-12 — GitHub Pages 文档站上线
+
+[v0.4.0 — GitHub Pages 文档站](#) 提前达成 🎉
+
+- 🌐 在线地址：https://mars535821089-ops.github.io/MiniMax-claude-proxy/latest/
+- 🎨 mkdocs + Material 主题（中文优化）
+- 🔍 全文搜索（中文友好，"缓存" "thinking" 都能搜到）
+- 🌓 暗色模式 + 移动端响应式
+- 🚀 push to main 自动部署 workflow
+- 📚 11 个文档源文件：快速开始 / 架构详解 / 配置 / API / 排错 / 贡献 / 安全 / 协议 / 里程碑 / Changelog / 索引
+
+---
+
 ## 🎯 未来里程碑（待实现，欢迎 PR）
 
 | 目标 | 状态 | 描述 |
 |------|------|------|
 | v0.2.0 — Web 控制台 | 📋 计划 | 实时看缓存命中率 / SSE 事件流 / 工具调用日志 |
 | v0.3.0 — Docker 镜像 | 📋 计划 | 一行 `docker run` 启动 |
-| v0.4.0 — GitHub Pages 文档站 | 📋 计划 | mkdocs material，搜索友好 |
+| ~~v0.4.0 — GitHub Pages 文档站~~ | ✅ **DONE** | mkdocs material，已上线 |
 | v1.0.0 — 生产稳定版 | 📋 计划 | API 100% 兼容 Anthropic Messages spec |
 | 100 ⭐ | ⏳ 等待 | 第一次有用户 star |
 | 第一个外部 PR | ⏳ 等待 | 来自其他贡献者的代码 |

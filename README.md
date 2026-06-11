@@ -26,9 +26,20 @@
   <a href="./MILESTONES.md">
     <img alt="Milestone" src="https://img.shields.io/badge/milestone-2026--06--12%20first%20release-ff69b4?style=flat-square">
   </a>
+  <a href="https://mars535821089-ops.github.io/MiniMax-claude-proxy/latest/">
+    <img alt="Docs" src="https://img.shields.io/badge/docs-mkdocs%20material-blue?style=flat-square&logo=materialformkdocs">
+  </a>
+  <a href="https://github.com/Mars535821089-ops/MiniMax-claude-proxy/actions/workflows/test.yml">
+    <img alt="Tests" src="https://img.shields.io/badge/tests-21%2F21%20passing-brightgreen?style=flat-square">
+  </a>
+  <a href="https://github.com/Mars535821089-ops/MiniMax-claude-proxy/blob/main/MILESTONES.md#-2026-06-12--6-大块真上游全-pass">
+    <img alt="E2E" src="https://img.shields.io/badge/e2e-6%2F6%20upstream%20PASS-success?style=flat-square">
+  </a>
 </p>
 
 [🇺🇸 English](./README.en.md) | [🇨🇳 简体中文](./README.md)
+
+> 📖 **完整文档已上线**：https://mars535821089-ops.github.io/MiniMax-claude-proxy/latest/ （mkdocs + Material 主题 + 中文搜索）
 
 ---
 
