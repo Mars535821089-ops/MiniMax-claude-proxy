@@ -71,3 +71,8 @@ Thumbs.db
 
 # ===== mkdocs 构建产物（不提交，由 CI 部署） =====
 /site/
+
+# ===== Session 内部备忘（不入库） =====
+.session-handoff.md
+*.handoff.md
+docs/blog/drafts/
