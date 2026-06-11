@@ -14,6 +14,9 @@ dist/
 
 # ===== 配置（包含真实 API Key） =====
 config.yaml
+config.yaml.bak
+config.yaml.bak.*
+config.yaml.bak*
 config.local.yaml
 *.local.yaml
 secrets.yaml
@@ -65,3 +68,6 @@ Thumbs.db
 # ===== 用户运行时（可能含隐私） =====
 ~/.MiniMax-claude-proxy/
 # 注：仓库根的 .MiniMax-claude-proxy/ 是合法的示例配置目录，不忽略
+
+# ===== mkdocs 构建产物（不提交，由 CI 部署） =====
+/site/

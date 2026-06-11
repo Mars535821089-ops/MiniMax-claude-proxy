@@ -1,0 +1,132 @@
+# mkdocs + Material 主题配置
+# 文档站：https://Mars535821089-ops.github.io/MiniMax-claude-proxy
+# 配合 mike 做多版本管理（v0.1.0 / main）
+site_name: MiniMax-Claude-Proxy
+site_description: 🔌 在 Claude Code 框架下完整释放 MiniMax-M3 能力的本地代理
+site_url: https://Mars535821089-ops.github.io/MiniMax-claude-proxy/
+site_author: The MiniMax-Claude-Proxy Authors
+repo_url: https://github.com/Mars535821089-ops/MiniMax-claude-proxy
+repo_name: Mars535821089-ops/MiniMax-claude-proxy
+edit_uri: edit/main/docs/
+
+# 版权信息
+copyright: Copyright &copy; 2026 The MiniMax-Claude-Proxy Authors · MIT License
+
+# 不需要 google analytics/cookie 提示
+strict: true
+
+# 主题：Material with 中文优化
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+    - content.action.view
+    - content.tooltips
+  palette:
+    # 亮色 / 暗色双模式
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到暗色
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到亮色
+  font:
+    text: Noto Sans SC
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+
+# 扩展：增强 markdown 渲染
+markdown_extensions:
+  - admonition          # 提示框
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.caret
+  - pymdownx.smartsymbols
+  - pymdownx.betterem
+
+# 插件：搜索 + 版本管理
+plugins:
+  - search:
+      lang: zh
+      separator: '[\s​\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - mike:
+      canonical_version: latest
+      version_selector: true
+      css_dir: stylesheets
+
+# 额外 CSS / JS
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+
+# 页面导航（顺序很重要）
+nav:
+  - 首页: index.md
+  - 快速开始: quickstart.md
+  - 架构详解: architecture.md
+  - 配置参考: configuration.md
+  - API 端点: api.md
+  - 排错 FAQ: troubleshooting.md
+  - 项目里程碑: milestones.md
+  - 贡献指南: contributing.md
+  - 安全政策: security.md
+  - 更新日志: changelog.md
+  - 开源协议: license.md
