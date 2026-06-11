@@ -1,0 +1,54 @@
+/* 自定义样式 */
+
+/* 优化中文排版 */
+.md-typeset {
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
+}
+
+/* 让代码块更突出 */
+.md-typeset pre > code {
+  font-size: 0.85em;
+  padding: 1em;
+  border-radius: 8px;
+}
+
+/* 标题加底部装饰 */
+.md-typeset h2 {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding-bottom: 0.5em;
+}
+
+/* 表格 zebra 增强 */
+.md-typeset table:not([class]) th {
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* 自定义 admonition 图标 */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: #448aff;
+}
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #00bfa5;
+}
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: #ff9100;
+}
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-color: #ff1744;
+}
+
+/* 首页 grid cards 优化 */
+.md-typeset .grid.cards > ul > li {
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
