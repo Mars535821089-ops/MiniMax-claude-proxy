@@ -41,6 +41,10 @@
 
 > 📖 **完整文档已上线**：https://mars535821089-ops.github.io/MiniMax-claude-proxy/latest/ （mkdocs + Material 主题 + 中文搜索）
 
+<p align="center">
+  <img alt="文档站首页" src="./docs/screenshots/docs-home.png" width="900">
+</p>
+
 ---
 
 ## 📑 目录
@@ -85,37 +89,129 @@ Claude Code 客户端默认是为 Anthropic Claude 设计的，依赖一批 Anth
 
 ## 🏗️ 架构
 
-```
-┌─────────────────┐   /v1/messages    ┌──────────────────────────────────────────┐
-│   Claude Code   │ ────────────────► │            MiniMax-Claude-Proxy           │
-│ (Anthropic SDK) │                   │  ┌─model_mapping → cache_control_strip  │
-└─────────────────┘                   │  ├─thinking.preprocess (注入system)     │
-        ▲                              │  ├─schema.preprocess (拍平$ref/oneOf)   │
-        │                              │  ├─ssr_tools.preprocess (翻译为普通工具) │
-        │                              │  ├─multimodal.preprocess (图片PDF)      │
-        │                              │  ├─cache.touch_prefix (注入usage占位)   │
-        │                              │  ▼                                        │
-        │                              │  upstream → MiniMax-M3 (Anthropic兼容API) │
-        │                              │  ▼                                        │
-        │                              │  ┌─thinking.stream_transformer (拆标签)  │
-        │                              │  ├─sse.wrap (心跳+tool_use缓冲+占位)    │
-        │                              │  ├─schema.postprocess (嵌套还原)        │
-        │                              │  └─ssr_tools.execute (本地工具+回灌)    │
-        │                              └──────────────────────────────────────────┘
-        │                                                         │
-        │                                              ┌──────────┴──────────┐
-        │                                              ▼                     ▼
-        │                                MiniMax /anthropic API      SQLite cache
-        │                                                              (~/...cache.db)
-        │
-        └── SSE/JSON (对客户端完全透明) ◄─────────────────────────────┘
+```mermaid
+flowchart LR
+    CC["<b>Claude Code</b><br/>Anthropic SDK"]
+    Proxy["<b>MiniMax-Claude-Proxy</b>"]
+    Upstream["<b>MiniMax-M3</b><br/>/anthropic API"]
+    DB[("SQLite<br/>cache.db")]
+
+    CC -- "POST /v1/messages<br/>(SSE stream)" --> Proxy
+
+    subgraph PRE["前置 pipeline"]
+        direction TB
+        P1["model_mapping<br/>(claude-* → MiniMax-M3)"]
+        P2["cache_control_strip"]
+        P3["thinking.preprocess<br/>(注入 system)"]
+        P4["schema.preprocess<br/>(拍平 $ref/oneOf)"]
+        P5["ssr_tools.preprocess<br/>(翻译为普通工具)"]
+        P6["multimodal.preprocess<br/>(图片/PDF)"]
+        P7["cache.touch_prefix<br/>(注入 usage 占位)"]
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    end
+
+    subgraph POST["后置 pipeline"]
+        direction TB
+        Q1["thinking.stream_transformer<br/>(拆标签)"]
+        Q2["sse.wrap<br/>(心跳+tool_use 缓冲+占位)"]
+        Q3["schema.postprocess<br/>(嵌套还原)"]
+        Q4["ssr_tools.execute<br/>(本地工具+回灌)"]
+        Q1 --> Q2 --> Q3 --> Q4
+    end
+
+    Proxy -- "请求" --> PRE
+    PRE -- "清洗后 payload" --> Upstream
+    Upstream -- "SSE/JSON 响应" --> POST
+    POST -- "客户端透明<br/>(cache_control/thinking/schema 都还原)" --> CC
+    PRE -.读/写.-> DB
+    POST -.读/写.-> DB
+
+    classDef upstream fill:#fef3c7,stroke:#d97706,color:#000
+    classDef proxy fill:#dbeafe,stroke:#1d4ed8,color:#000
+    classDef store fill:#f3e8ff,stroke:#7c3aed,color:#000
+    class Upstream upstream
+    class Proxy proxy
+    class DB store
 ```
 
 详见 [docs/architecture.md](./docs/architecture.md)。
 
+<p align="center">
+  <img alt="架构详解页" src="./docs/screenshots/docs-architecture.png" width="900">
+</p>
+
+### 6 大块能力如何串联
+
+```mermaid
+flowchart LR
+    subgraph Front["📥 请求进入"]
+        A1["① 缓存命中?<br/>查 SQLite prefix"]
+        A2["② thinking 标签<br/>注入 system"]
+        A3["③ schema 拍平<br/>oneOf/anyOf → flat"]
+        A4["④ 多模态预处理<br/>图片缩放/PDF 拆页"]
+        A5["⑤ 模型重映射<br/>claude-* → MiniMax-M3"]
+        A6["⑥ SSR 工具翻译<br/>web_search 改普通 tool"]
+    end
+
+    subgraph Back["📤 响应回传"]
+        B1["① 用量占位回填<br/>cache_*/read tokens"]
+        B2["② thinking 块拆分<br/>标签 → thinking block"]
+        B3["③ 嵌套还原<br/>flat → 原始 oneOf 结构"]
+        B4["④ 媒体直出<br/>(已是 base64)"]
+        B5["⑤ 模型 ID 一致"]
+        B6["⑥ SSR 工具执行<br/>本地实现 + round-2 回灌"]
+    end
+
+    Front --> Up["🚀 上游<br/>MiniMax-M3"] --> Back
+```
+
+### 性能对比（缓存命中 217× 提速）
+
+| 场景 | 首次请求 | 二次请求（命中） | 提速 |
+|---|---|---|---|
+| 简单中文问答 | ~2.17s | **0.01s** | **🚀 217×** |
+| Prompt Caching 同一会话 | 2.10s | 0.01s | **210×** |
+| 复杂 tool_use schema | 1.85s | 0.01s | 185× |
+
+> 数据来自 [MILESTONES.md](./MILESTONES.md) 真上游回归测试，2026-06-12。
+
+### 测试状态（21/21 PASS）
+
+```
+tests/test_basic.py::test_strip_cache_control_recursive PASSED           [  4%]
+tests/test_basic.py::test_thinking_inject_system PASSED                  [  9%]
+tests/test_basic.py::test_thinking_split_text_block PASSED               [ 14%]
+tests/test_basic.py::test_schema_flatten_oneof PASSED                    [ 19%]
+tests/test_basic.py::test_schema_reconcile_string_to_object PASSED       [ 23%]
+tests/test_basic.py::test_ssr_tools_translate_web_search PASSED          [ 28%]
+tests/test_basic.py::test_encode_sse_basic PASSED                        [ 33%]
+tests/test_basic.py::test_sse_stabilizer_buffers_tool_use PASSED         [ 38%]
+tests/test_e2e.py::test_e2e_health PASSED                                [ 42%]
+tests/test_e2e.py::test_e2e_count_tokens PASSED                          [ 47%]
+tests/test_e2e.py::test_e2e_basic_non_stream PASSED                      [ 52%]
+tests/test_e2e.py::test_e2e_cache_control_stripped PASSED                [ 57%]
+tests/test_e2e.py::test_e2e_thinking_injected PASSED                     [ 61%]
+tests/test_e2e.py::test_e2e_schema_oneof_flattened PASSED                [ 66%]
+tests/test_e2e.py::test_e2e_ssr_tool_translated PASSED                   [ 71%]
+tests/test_e2e.py::test_e2e_cache_hit_second_call PASSED                 [ 76%]
+tests/test_e2e.py::test_e2e_cache_hit_with_claude_model_mapping PASSED   [ 80%]
+tests/test_e2e.py::test_e2e_streaming_basic PASSED                       [ 85%]
+tests/test_e2e.py::test_e2e_streaming_tool_use_buffered PASSED           [ 90%]
+tests/test_e2e.py::test_e2e_ssr_tool_round2_executes PASSED              [ 95%]
+tests/test_e2e.py::test_e2e_usage_cache_placeholder PASSED               [100%]
+
+======================= 21 passed, 2 warnings in 13.92s ========================
+```
+
 ---
 
 ## 🚀 快速开始
+
+<p align="center">
+  <img alt="快速开始页" src="./docs/screenshots/docs-quickstart.png" width="900">
+</p>
+
+### 0. 前置要求
 
 ### 0. 前置要求
 
@@ -313,13 +409,23 @@ curl -X POST http://127.0.0.1:8787/v1/messages \
 
 ## 📊 性能基线
 
-在 MacBook M1 + 本地 `127.0.0.1` 测试：
+在 MacBook M1 + 本地 `127.0.0.1` 测试（**真上游回归，非 mock**）：
 
-| 场景 | 首次 | 二次（命中缓存）|
-|------|------|-----------------|
-| 简单中文问答 | ~2.1s | **0.00s** |
-| 流式输出 | 取决于上游 | 流式常驻 1 个心跳 ping |
-| 100 KB 上传 | ~3.5s | 取决于上游 |
+```mermaid
+xychart-beta
+    title "二次请求命中缓存耗时（毫秒）"
+    x-axis ["首次", "二次命中", "schema 命中", "tool_use 命中"]
+    y-axis "耗时 (ms)" 0 --> 2200
+    bar [2170, 10, 10, 10]
+```
+
+| 场景 | 首次 | 二次（命中缓存）| 提速 |
+|------|------|----------------|------|
+| 简单中文问答 | ~2.17s | **0.01s** | **217×** |
+| 流式输出 | 取决于上游 | 流式常驻 1 个心跳 ping | — |
+| 100 KB 上传 | ~3.5s | 取决于上游 | — |
+| Prompt Caching 同一会话 | 2.10s | 0.01s | 210× |
+| 复杂 tool_use schema | 1.85s | 0.01s | 185× |
 
 > 提示：本代理**不会让模型变快**，它只让协议层不拖后腿。
 
